@@ -34,7 +34,7 @@ public class Solution {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         try {
-            in = new Scanner(new FileReader("src/com/company/largest_permutation/input.txt"));
+            in = new Scanner(new FileReader("src/com/company/largest_permutation/input1.txt"));
         } catch (FileNotFoundException e) {
             //use System.in
         }

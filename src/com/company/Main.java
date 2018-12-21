@@ -18,6 +18,4 @@ public class Main {
 
     }
 
-    static class A {};
-    static class B extends A {};
 }
