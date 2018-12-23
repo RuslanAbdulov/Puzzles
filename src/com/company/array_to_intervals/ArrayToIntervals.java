@@ -15,13 +15,11 @@ public class ArrayToIntervals {
     private static String toIntervals(int[] numbers){
         Arrays.sort(numbers);
         StringBuilder sb = new StringBuilder();
-
         sb.append(numbers[0]);
-        for (int i = 1; i < numbers.length ; i++) {
 
+        for (int i = 1; i < numbers.length ; i++) {
             if (numbers[i] - numbers[i-1] > 1) {
                 sb.append("-").append(numbers[i-1]).append(",").append(numbers[i]);
-                numbers[i-1] = numbers[i];
             }
         }
 
