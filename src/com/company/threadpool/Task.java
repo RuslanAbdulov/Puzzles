@@ -24,6 +24,10 @@ public class Task implements Delayed {
         return runnable;
     }
 
+    public long getDelay() {
+        return delay;
+    }
+
     @Override
     public long getDelay(TimeUnit unit) {
         long diff = executeAt - System.currentTimeMillis();
