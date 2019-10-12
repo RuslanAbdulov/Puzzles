@@ -30,14 +30,15 @@ class Solution {
 
         int result = solve(tLights, speed);
 
-        System.out.println(result);
+        System.out.println(result);//60
     }
 
     private static int solve(List<TL> tLights, int speed) {
         for (int speedToSet = speed; speedToSet > 0; speedToSet--) {
             boolean allGreen = true;
             for (TL tl : tLights) {
-                double tlPhase = tl.distance * 1.0/(kmphToMps(speedToSet) * tl.duration);
+                BigDecimal tlPhase = BigDecimal.valueOf(tl.distance)
+                        .divide(kmphToMps(speedToSet).multiply(BigDecimal.valueOf(tl.duration)), 4, RoundingMode.HALF_UP);
                 if (!isGreen(tlPhase)) {
                     allGreen = false;
                     break;
@@ -52,14 +53,15 @@ class Solution {
         return 0;
     }
 
-    private static boolean isGreen(double tlPhase) {
-        int instantSwitch = tlPhase == Math.ceil(tlPhase)? 1: 0;
-        return Math.ceil(tlPhase) % 2 + instantSwitch == 1;
+    private static boolean isGreen(BigDecimal tlPhase) {
+        double tlPhaseDV = tlPhase.doubleValue();
+        int instantSwitch = tlPhaseDV == Math.ceil(tlPhaseDV)? 1: 0;
+        return Math.ceil(tlPhaseDV) % 2 + instantSwitch == 1;
 
     }
 
-    private static double kmphToMps(int speedKmph) {
-        return speedKmph * 1000.0 / 3600;
+    private static BigDecimal kmphToMps(int speedKmph) {
+        return new BigDecimal(speedKmph * 1000.0 / 3600, MathContext.DECIMAL32);
     }
 
     private static int mpsToKmph(int speedMps) {
