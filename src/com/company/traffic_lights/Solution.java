@@ -61,7 +61,7 @@ class Solution {
     }
 
     private static BigDecimal kmphToMps(int speedKmph) {
-        return new BigDecimal(speedKmph * 1000.0 / 3600, MathContext.DECIMAL32);
+        return new BigDecimal(speedKmph * 1000.0 / 3600, MathContext.UNLIMITED);
     }
 
     private static int mpsToKmph(int speedMps) {
