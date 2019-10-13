@@ -39,7 +39,7 @@ public class Solution {
             return (numbers.get(middle - 1) + numbers.get(middle)) * 1.0 / 2;
         }
     }
-    //TODO max by val min by key
+
     private static int mode(List<Integer> numbers) {
         Map<Integer, Integer> frequencyMap = new HashMap<>(numbers.size());
         numbers.forEach(num -> frequencyMap.compute(num, (k, v) -> (v == null) ? 1 : v + 1));
