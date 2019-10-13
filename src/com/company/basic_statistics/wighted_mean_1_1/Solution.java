@@ -26,7 +26,7 @@ public class Solution {
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
 
 
-        System.out.println(weightedMean(numbers, weights));
+        System.out.println(format(weightedMean(numbers, weights)));
     }
 
 
@@ -39,7 +39,7 @@ public class Solution {
         }
 
         long sum = numbers.stream().reduce(0, Integer::sum);
-        return weightedSum / totalWeight;
+        return weightedSum * 1.0 / totalWeight;
     }
 
     private static String format(double value) {
