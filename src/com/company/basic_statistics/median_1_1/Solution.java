@@ -9,7 +9,7 @@ public class Solution {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         try {
-            in = new Scanner(new FileReader("src/com/company/basic_statistics/median_1_1/input.txt"));
+            in = new Scanner(new FileReader("src/com/company/basic_statistics/median_1_1/input1.txt"));
         } catch (FileNotFoundException e) {
             //use System.in
         }
@@ -39,11 +39,17 @@ public class Solution {
             return (numbers.get(middle - 1) + numbers.get(middle)) * 1.0 / 2;
         }
     }
-
+    //TODO max by val min by key
     private static int mode(List<Integer> numbers) {
         Map<Integer, Integer> frequencyMap = new HashMap<>(numbers.size());
         numbers.forEach(num -> frequencyMap.compute(num, (k, v) -> (v == null) ? 1 : v + 1));
-        return  frequencyMap.entrySet().stream()
+        int maxFq = frequencyMap.entrySet().stream()
+                .max(Comparator.comparing(Map.Entry::getValue))
+                .map(Map.Entry::getValue)
+                .orElse(1);
+
+        return frequencyMap.entrySet().stream()
+                .filter(e -> e.getValue() == maxFq)
                 .sorted(Comparator.comparing(Map.Entry::getKey))
                 .findFirst()
                 .map(Map.Entry::getKey)
