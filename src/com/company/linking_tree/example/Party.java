@@ -1,4 +1,4 @@
-package com.company.linking_tree;
+package com.company.linking_tree.example;
 
 public class Party {
 

@@ -1,4 +1,4 @@
-package com.company.linking_tree;
+package com.company.linking_tree.example;
 
 import java.util.ArrayList;
 import java.util.List;
