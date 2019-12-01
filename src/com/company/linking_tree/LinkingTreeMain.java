@@ -3,6 +3,9 @@ package com.company.linking_tree;
 import com.company.linking_tree.example.Arrangement;
 import com.company.linking_tree.example.CobRequest;
 import com.company.linking_tree.example.Party;
+
+import java.util.List;
+
 /**
  * TODO consider different structure - multi-dimensional table of references and a collection of Map<Ref, Entity>
  */
@@ -27,10 +30,27 @@ public class LinkingTreeMain {
         lTree.findNode( "party1", Party.class).value = new Party ("party1", "party value 1");
 
         System.out.println(lTree.print());
+        //Erases child references
+        lTree.add("cob1", new CobRequest("cob1", "cob value 1"));
 
 
         System.out.println(lTree.findAllFrom("cob1", CobRequest.class, Party.class));
         System.out.println(lTree.findAllFrom("cob2", CobRequest.class, Party.class));
+        System.out.println();
+        System.out.println(lTree.findAllFrom("cob1", CobRequest.class, Arrangement.class));
+        System.out.println(lTree.findAllFrom("cob2", CobRequest.class, Arrangement.class));
+        System.out.println();
+        System.out.println(lTree.findAll(CobRequest.class));
 
+
+        List<CobRequest> cobRequests = lTree.findAll(CobRequest.class);
+        cobRequests.forEach(cobRequest -> {
+            cobRequest.parties.addAll(
+                    lTree.findAllFrom(cobRequest.id, cobRequest.getClass(), Party.class));
+            cobRequest.arrangements.addAll(
+                    lTree.findAllFrom(cobRequest.id, cobRequest.getClass(), Arrangement.class));
+        });
+
+        System.out.println(cobRequests);
     }
 }

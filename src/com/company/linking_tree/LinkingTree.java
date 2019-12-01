@@ -1,6 +1,7 @@
 package com.company.linking_tree;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -21,45 +22,74 @@ import java.util.stream.Collectors;
 public class LinkingTree {
 
     private Map<Class, LevelMap> classLevelMap = new HashMap<>();
-    //TODO in general should be a Tree
-    private List<LevelMap> levels = new ArrayList<>();
     private int levelsCount;//not sure if this is needed
 
-    //@SuppressWarnings("unchecked")
+    /**
+     * Build LinkingTree from sequence of pairs of key and value types
+     * new LinkingTree(Class<Key1>, Class<Value1>, Class<Key2>, Class<Value2>, ...)
+     * LinkingTree lTree = new LinkingTree(
+     *             String.class, CobRequest.class,  //1st level
+     *             String.class, Arrangement.class, //2nd level
+     *             String.class, Party.class);      //3rd level
+     * @param args - sequence of class types, must be even
+     */
+    public LinkingTree(Class<?>... args) {
+        for (int i = 0; i < args.length; i += 2) {
+            if (args.length - i > 1) {
+                addLevel(args[i], args[i + 1]);
+            } else {
+                throw new IllegalArgumentException("Number of arguments must be even");
+            }
+        }
+    }
+
+    /**
+     * Fluent API to build LinkingTree
+     * LinkingTree lTree = new LinkingTree()
+     *             .addLevel(String.class, CobRequest.class)    //1st level
+     *             .addLevel(String.class, Arrangement.class)   //2nd level
+     *             .addLevel(String.class, Party.class);        //3rd level
+     */
     public <K, V>  LinkingTree addLevel(Class<K> keyType, Class<V> valueType) {
         if (classLevelMap.get(valueType) != null) {
             throw new IllegalArgumentException("Multiple levels of the same type are not currently supported");
         }
 
-        if (levelsCount > 0) {
-            levels.get(levelsCount - 1).setChildType(keyType, valueType);
-        }
         LevelMap<K, V> newLevel = new LevelMap<>(++levelsCount, keyType, valueType);
         classLevelMap.put(valueType, newLevel);
-        levels.add(newLevel);
 
         return this;
     }
 
     /**
-     * Add first level node
+     * Add node
      * When key and value are known
      */
     public <K, V> LevelMap.Node<K, V> add(K key, V value) {
         LevelMap levelMap = classLevelMap.get(value.getClass());
-        LevelMap.Node<K, V> node = new LevelMap.Node<>(key, value);
-        levelMap.put(key, node);
+        LevelMap.Node<K, V> node = levelMap.getWithTypeCheck(key);
+        if (node != null) {
+            node.value = value;
+        } else {
+            node = new LevelMap.Node<>(key, value);
+            levelMap.putWithTypeCheck(key, node);
+        }
+
         return node;
     }
 
     /**
-     * Add first level node
+     * Add node
      * When only key is known
      */
     public <K, V> LevelMap.Node<K, V> add(K key, Class<V> valueType) {
         LevelMap levelMap = classLevelMap.get(valueType);
-        LevelMap.Node<K, V> node = new LevelMap.Node<>(key, null);
-        levelMap.put(key, node);
+        LevelMap.Node<K, V> node = levelMap.getWithTypeCheck(key);
+        if (node == null) {
+            node = new LevelMap.Node<>(key, null);
+            levelMap.putWithTypeCheck(key, node);
+        }
+
         return node;
     }
 
@@ -70,7 +100,7 @@ public class LinkingTree {
         requireLevelExistence(parentValueType);
 
         LevelMap levelMap = classLevelMap.get(parentValueType);
-        LevelMap.Node<K, V> parentNode = (LevelMap.Node<K, V>) levelMap.get(parentKey);
+        LevelMap.Node<K, V> parentNode = (LevelMap.Node<K, V>) levelMap.getWithTypeCheck(parentKey);
         if (parentNode == null) {
             throw new IllegalArgumentException(String.format("Parent node %s of type %s not found", parentKey, parentValueType));
         }
@@ -86,7 +116,7 @@ public class LinkingTree {
      * Add child along with parent-child reference
      */
     public <K, V, CK, CV> LevelMap.Node<CK, CV> add(K parentKey, Class<V> parentValueType, CK childKey, CV childValue) {
-        LevelMap.Node<CK, CV> childNode = add(parentKey, parentValueType, childKey, (Class<CV>)childValue.getClass());
+        LevelMap.Node<CK, CV> childNode = add(parentKey, parentValueType, childKey, (Class<CV>) childValue.getClass());
         childNode.value = childValue;
         return childNode;
     }
@@ -148,25 +178,6 @@ public class LinkingTree {
                 .collect(Collectors.toSet());
     }
 
-    //TODO reduce complexity
-//    private <CK, CV> Set<LevelMap.Node<CK, CV>> collectChildNodesOfType(Set<LevelMap.Node> nodes, Class<CV> valueType) {
-//        if (nodes.isEmpty()) {
-//            return Collections.emptySet();
-//        }
-//
-//        return nodes.stream()
-//                .map(child -> {
-//                    if (valueType.isInstance(child.value)) {
-//                        return Collections.singleton(child);
-//                    } else {
-//                        return collectChildNodesOfType(child.children, valueType);
-//                    }
-//                })
-//                .flatMap(Collection::stream)
-//                .map(node -> (LevelMap.Node<CK, CV>) node)
-//                .collect(Collectors.toSet());
-//    }
-
 
     public <K, V> V find(K key, Class<V> valueType) {
         return findNode(key, valueType).value;
@@ -176,6 +187,18 @@ public class LinkingTree {
         return findAllNodes(valueType).stream()
                 .map(node -> node.value)
                 .collect(Collectors.toList());
+    }
+
+    public <V> List<LevelMap.Node> findEmptyNodes(Class<V> valueType) {
+        return findAllNodes(valueType).stream()
+                .filter(node -> node.value == null)
+                .collect(Collectors.toList());
+    }
+
+    public Map<Class, List<LevelMap.Node>> findEmptyNodes() {
+        return classLevelMap.keySet().stream()
+                .filter(clazz -> !findEmptyNodes(clazz).isEmpty())
+                .collect(Collectors.toMap(Function.identity(), this::findEmptyNodes));
     }
 
 
@@ -201,20 +224,50 @@ public class LinkingTree {
         Class<K> keyType;
         Class<V> valueType;
 
-        Class<?> childKeyType;
-        Class<?> childValueType;
-
-        public LevelMap(int level, Class<K> keyType, Class<V> valueType) {
+        LevelMap(int level, Class<K> keyType, Class<V> valueType) {
             this.level = level;
             this.keyType = keyType;
             this.valueType = valueType;
         }
 
-        public LevelMap setChildType(Class<?> childKeyType, Class<?> childValueType) {
-            this.childKeyType = childKeyType;
-            this.childValueType = childValueType;
+        @SuppressWarnings("unchecked")
+        LevelMap.Node<K, V> putWithTypeCheck(Object key, Object node) {
+            checkKeyType(key);
+            if (node instanceof LevelMap.Node) {
+                checkValueType(((Node<K, V>) node).value);
+            } else {
+                throw new IllegalArgumentException(
+                        String.format("Wrong node argument type %s, should be %s", Node.class, keyType));
+            }
 
-            return this;
+            this.put((K) key, (Node<K, V>) node);
+            return (Node<K, V>) node;
+        }
+
+        LevelMap.Node<K, V> getWithTypeCheck(Object key) {
+            checkKeyType(key);
+
+            return this.get(key);
+        }
+
+        private void checkKeyType(Object key) {
+            if (key == null) {
+                return;
+            }
+            if (!keyType.isInstance(key)) {
+                throw new IllegalArgumentException(
+                        String.format("Wrong key type %s, should be %s", key.getClass(), keyType));
+            }
+        }
+
+        private void checkValueType(Object value) {
+            if (value == null) {
+                return;
+            }
+            if (!valueType.isInstance(value)) {
+                throw new IllegalArgumentException(
+                        String.format("Wrong value type %s, should be %s", value.getClass(), valueType));
+            }
         }
 
         //TODO can this class not be static?
@@ -264,12 +317,4 @@ public class LinkingTree {
     //TODO implement add child with/out value first, add parent later
     //TODO sanity check - every node should be reachable from one of the 1st level nodes
     //TODO build LinkingTree using reflection, traverse fields/methods from root to child classes
-
-    //TODO check if with Class<?>... args all levels can be defined with child types right away
-    //    public LinkingTree(Class<?>... args) {
-    //        for (int i = 0; i < args.length; i +=2) {
-    //            addLevel(args[i], args[i+1]);
-    //        }
-    //
-    //    }
 }

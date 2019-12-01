@@ -1,3 +1,4 @@
+Does LevelMap metadata needed?
 accept Entity::method reference instead of key
 method checking if there is a key without value
 method populating nodes without values using pair(key, value) or collection of values and keyExtractor method
