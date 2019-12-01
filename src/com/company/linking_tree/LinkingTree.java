@@ -120,7 +120,7 @@ public class LinkingTree {
      * @param parentValueType
      * @param valueType
      */
-    public <K, V, CK, CV> Set<LevelMap.Node<CK, CV>> findAllNodes(K parentKey, Class<V> parentValueType, Class<CV> valueType) {
+    public <K, V, CK, CV> Set<LevelMap.Node<CK, CV>> findAllNodesFrom(K parentKey, Class<V> parentValueType, Class<CV> valueType) {
         requireParentChildRelation(parentValueType, valueType);
 
         LevelMap.Node<K, V> parentNode = findNode(parentKey, parentValueType);
@@ -141,6 +141,12 @@ public class LinkingTree {
         return new HashSet(queue);
     }
 
+    public <K, V, CV> Set<CV> findAllFrom(K parentKey, Class<V> parentValueType, Class<CV> valueType) {
+        return findAllNodesFrom(parentKey, parentValueType, valueType)
+                .stream()
+                .map(node -> node.value)
+                .collect(Collectors.toSet());
+    }
 
     //TODO reduce complexity
 //    private <CK, CV> Set<LevelMap.Node<CK, CV>> collectChildNodesOfType(Set<LevelMap.Node> nodes, Class<CV> valueType) {

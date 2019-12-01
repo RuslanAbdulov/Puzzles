@@ -29,8 +29,8 @@ public class LinkingTreeMain {
         System.out.println(lTree.print());
 
 
-        System.out.println(lTree.findAllNodes("cob1", CobRequest.class, Arrangement.class));
-        System.out.println(lTree.findAllNodes("cob2", CobRequest.class, Arrangement.class));
+        System.out.println(lTree.findAllFrom("cob1", CobRequest.class, Party.class));
+        System.out.println(lTree.findAllFrom("cob2", CobRequest.class, Party.class));
 
     }
 }
