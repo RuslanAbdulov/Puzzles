@@ -8,9 +8,14 @@ sanity check - every node should be reachable from one of the 1st level nodes
 build LinkingTree using reflection, traverse fields/methods from root to child classes
 
 //TODO check if with Class<?>... args all levels can be defined with child types right away
-//    public LinkingTree(Class<?>... args) {
-//        for (int i = 0; i < args.length; i +=2) {
-//            addLevel(args[i], args[i+1]);
-//        }
-//
-//    }
+public LinkingTree(Class<?>... args) {
+    for (int i = 0; i < args.length; i += 2) {
+        if (args.length - i > 3) {
+            addLevel(args[i], args[i + 1], args[i + 2], args[i + 3]);
+        } else if (args.length - i > 1) {
+            addLevel(args[i], args[i + 1]);
+        } else {
+            throw new IllegalArgumentException("Number of arguments must be even");
+        }
+    }
+}

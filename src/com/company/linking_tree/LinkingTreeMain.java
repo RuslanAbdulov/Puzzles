@@ -22,13 +22,15 @@ public class LinkingTreeMain {
         lTree.add("cob1", CobRequest.class, "arr1", new Arrangement("arr1", "arrangement value 1"));
         lTree.add("arr1", Arrangement.class, "party1", Party.class);
 
+        lTree.add("cob2", CobRequest.class, "arr2", new Arrangement("arr2", "arrangement value 2"));
+
         lTree.findNode( "party1", Party.class).value = new Party ("party1", "party value 1");
 
         System.out.println(lTree.print());
 
 
-//        lTree.findAll(CobRequest.class).forEach(
-//                cobRequest -> cobRequest.parties.add()
-//        );
+        System.out.println(lTree.findAllNodes("cob1", CobRequest.class, Arrangement.class));
+        System.out.println(lTree.findAllNodes("cob2", CobRequest.class, Arrangement.class));
+
     }
 }

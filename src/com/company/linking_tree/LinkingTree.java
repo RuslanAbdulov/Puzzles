@@ -124,34 +124,42 @@ public class LinkingTree {
         requireParentChildRelation(parentValueType, valueType);
 
         LevelMap.Node<K, V> parentNode = findNode(parentKey, parentValueType);
-//        if (parentNode.children.isEmpty()) {
-//            return Collections.emptySet();
-//        }
-
-
-//        valueType.equals(classLevelMap.get(parentValueType).childValueType)
-
-        return collectChildNodesOfType(parentNode.children, valueType);
-    }
-
-    private <K, V, CK, CV> Set<LevelMap.Node<CK, CV>> collectChildNodesOfType(
-            Set<LevelMap.Node<K, V>> nodes, Class<CV> valueType) {
-        if (nodes.isEmpty()) {
+        if (parentNode.children.isEmpty()) {
             return Collections.emptySet();
         }
 
-        return nodes.stream()
-                .map(child -> {
-                    if (valueType.isInstance(child.value)) {
-                        return Collections.singleton(child);
-                    } else {
-                        return collectChildNodesOfType(child.children, valueType);
-                    }
-                })
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        int distance = classLevelMap.get(valueType).level - classLevelMap.get(parentValueType).level;
 
+        LinkedList<LevelMap.Node> queue = new LinkedList<>();
+        queue.add(parentNode);
+        for (int i = 0; i < distance; i++) {
+            for (int j = 0; j < queue.size(); j++) {
+                queue.addAll(queue.pop().children);
+            }
+        }
+
+        return new HashSet(queue);
     }
+
+
+    //TODO reduce complexity
+//    private <CK, CV> Set<LevelMap.Node<CK, CV>> collectChildNodesOfType(Set<LevelMap.Node> nodes, Class<CV> valueType) {
+//        if (nodes.isEmpty()) {
+//            return Collections.emptySet();
+//        }
+//
+//        return nodes.stream()
+//                .map(child -> {
+//                    if (valueType.isInstance(child.value)) {
+//                        return Collections.singleton(child);
+//                    } else {
+//                        return collectChildNodesOfType(child.children, valueType);
+//                    }
+//                })
+//                .flatMap(Collection::stream)
+//                .map(node -> (LevelMap.Node<CK, CV>) node)
+//                .collect(Collectors.toSet());
+//    }
 
 
     public <K, V> V find(K key, Class<V> valueType) {
