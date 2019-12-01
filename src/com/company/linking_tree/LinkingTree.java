@@ -21,10 +21,11 @@ import java.util.stream.Collectors;
 public class LinkingTree {
 
     private Map<Class, LevelMap> classLevelMap = new HashMap<>();
-    private List<LevelMap> levels = new ArrayList<>();//not sure if this is needed
+    //TODO in general should be a Tree
+    private List<LevelMap> levels = new ArrayList<>();
     private int levelsCount;//not sure if this is needed
 
-    @SuppressWarnings("unchecked")
+    //@SuppressWarnings("unchecked")
     public <K, V>  LinkingTree addLevel(Class<K> keyType, Class<V> valueType) {
         if (classLevelMap.get(valueType) != null) {
             throw new IllegalArgumentException("Multiple levels of the same type are not currently supported");
@@ -47,7 +48,6 @@ public class LinkingTree {
     public <K, V> LevelMap.Node<K, V> add(K key, V value) {
         LevelMap levelMap = classLevelMap.get(value.getClass());
         LevelMap.Node<K, V> node = new LevelMap.Node<>(key, value);
-        //(LevelMap.Node<K, V>) levelMap.put(key, node);
         levelMap.put(key, node);
         return node;
     }
@@ -59,7 +59,6 @@ public class LinkingTree {
     public <K, V> LevelMap.Node<K, V> add(K key, Class<V> valueType) {
         LevelMap levelMap = classLevelMap.get(valueType);
         LevelMap.Node<K, V> node = new LevelMap.Node<>(key, null);
-        //(LevelMap.Node<K, V>) levelMap.put(key, node);
         levelMap.put(key, node);
         return node;
     }
@@ -68,11 +67,9 @@ public class LinkingTree {
      * Add parent-child reference
      */
     public <K, V, CK, CV> LevelMap.Node<CK, CV> add(K parentKey, Class<V> parentValueType, CK childKey, Class<CV> childValueType) {
-        LevelMap levelMap = classLevelMap.get(parentValueType);
-        if (levelMap == null) {
-            throw new IllegalArgumentException(String.format("Level for type %s not found", parentValueType));
-        }
+        requireLevelExistence(parentValueType);
 
+        LevelMap levelMap = classLevelMap.get(parentValueType);
         LevelMap.Node<K, V> parentNode = (LevelMap.Node<K, V>) levelMap.get(parentKey);
         if (parentNode == null) {
             throw new IllegalArgumentException(String.format("Parent node %s of type %s not found", parentKey, parentValueType));
@@ -87,7 +84,6 @@ public class LinkingTree {
 
     /**
      * Add child along with parent-child reference
-     * TODO can be rewritten as add(parentKey, parentValueType, childKey, (Class<CV>)childValue.getClass()).value = childValue;
      */
     public <K, V, CK, CV> LevelMap.Node<CK, CV> add(K parentKey, Class<V> parentValueType, CK childKey, CV childValue) {
         LevelMap.Node<CK, CV> childNode = add(parentKey, parentValueType, childKey, (Class<CV>)childValue.getClass());
@@ -103,20 +99,60 @@ public class LinkingTree {
     }
 
     public <K, V> LevelMap.Node<K, V> findNode(K key, Class<V> valueType) {
+        requireLevelExistence(valueType);
+
         LevelMap<K, V> levelMap = (LevelMap<K, V>) classLevelMap.get(valueType);
-        if (levelMap == null) {
-            throw new IllegalArgumentException(String.format("Level for type %s not found", valueType));
-        }
         return levelMap.get(key);
     }
 
-    public <K, V> Collection<LevelMap.Node<K, V>> findAllNodes(Class<V> valueType) {
+    public <K, V> Set<LevelMap.Node<K, V>> findAllNodes(Class<V> valueType) {
+        requireLevelExistence(valueType);
+
         LevelMap<K, V> levelMap = (LevelMap<K, V>) classLevelMap.get(valueType);
-        if (levelMap == null) {
-            throw new IllegalArgumentException(String.format("Level for type %s not found", valueType));
-        }
-        return levelMap.values();
+        return new HashSet<>(levelMap.values());
     }
+
+    /**
+     * Return all nodes of type {@code valueType} reachable from a lower level node of type {@code parentValueType}
+     * with key = {@code parentKey}
+     * Parent level does not have to be an immediate predecessor
+     * @param parentKey
+     * @param parentValueType
+     * @param valueType
+     */
+    public <K, V, CK, CV> Set<LevelMap.Node<CK, CV>> findAllNodes(K parentKey, Class<V> parentValueType, Class<CV> valueType) {
+        requireParentChildRelation(parentValueType, valueType);
+
+        LevelMap.Node<K, V> parentNode = findNode(parentKey, parentValueType);
+//        if (parentNode.children.isEmpty()) {
+//            return Collections.emptySet();
+//        }
+
+
+//        valueType.equals(classLevelMap.get(parentValueType).childValueType)
+
+        return collectChildNodesOfType(parentNode.children, valueType);
+    }
+
+    private <K, V, CK, CV> Set<LevelMap.Node<CK, CV>> collectChildNodesOfType(
+            Set<LevelMap.Node<K, V>> nodes, Class<CV> valueType) {
+        if (nodes.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return nodes.stream()
+                .map(child -> {
+                    if (valueType.isInstance(child.value)) {
+                        return Collections.singleton(child);
+                    } else {
+                        return collectChildNodesOfType(child.children, valueType);
+                    }
+                })
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+
+    }
+
 
     public <K, V> V find(K key, Class<V> valueType) {
         return findNode(key, valueType).value;
@@ -129,6 +165,22 @@ public class LinkingTree {
     }
 
 
+    private <V> void requireLevelExistence(Class<V> valueType) throws IllegalArgumentException {
+        if (classLevelMap.get(valueType) == null) {
+            throw new IllegalArgumentException(String.format("Level of type %s not found", valueType));
+        }
+    }
+
+    private <V, CV> void requireParentChildRelation(Class<V> parentValueType, Class<CV> childValueType)
+            throws IllegalArgumentException {
+        requireLevelExistence(parentValueType);
+        requireLevelExistence(childValueType);
+
+        if (classLevelMap.get(parentValueType).level >= classLevelMap.get(childValueType).level) {
+            throw new IllegalArgumentException(
+                    String.format("%s is not a parent of %s ", parentValueType, childValueType));
+        }
+    }
 
     public static class LevelMap<K, V> extends HashMap<K, LevelMap.Node<K, V>>{
         int level;
@@ -196,4 +248,14 @@ public class LinkingTree {
     //TODO method linking Nodes/keys of one level with child keys/values
     //TODO public void find(Object... args)
     //TODO implement add child with/out value first, add parent later
+    //TODO sanity check - every node should be reachable from one of the 1st level nodes
+    //TODO build LinkingTree using reflection, traverse fields/methods from root to child classes
+
+    //TODO check if with Class<?>... args all levels can be defined with child types right away
+    //    public LinkingTree(Class<?>... args) {
+    //        for (int i = 0; i < args.length; i +=2) {
+    //            addLevel(args[i], args[i+1]);
+    //        }
+    //
+    //    }
 }
