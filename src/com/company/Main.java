@@ -11,8 +11,8 @@ public class Main {
         List<? extends Number> numList;
 
         numList = intList;
-        numList.add(Integer.valueOf(1));
-        numList.add(2.0);
+//        numList.add(Integer.valueOf(1));
+//        numList.add(2.0);
 
 
     }
