@@ -30,7 +30,7 @@ public class LinkingTreeMain {
         lTree.findNode( "party1", Party.class).value = new Party ("party1", "party value 1");
 
         System.out.println(lTree.print());
-        //Erases child references
+
         lTree.add("cob1", new CobRequest("cob1", "cob value 1"));
 
 
