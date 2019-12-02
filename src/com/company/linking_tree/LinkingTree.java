@@ -5,16 +5,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * l1Node = linkingTree.find(key, type)
- * l1Node.addChild(key2, type2)
- * List<Type2Nodes> l2Nodes = l1Node.getChildren()
- *
- * l2Node = linkingTree.find(key1, type1, key2, type2) or l1Node.find(key2, type2)
- *
- * Case 1: CobRequests with keys and values, but no Arrangement keys
- * Case 1.a: Only CobRequests keys
- * Case 1.b: CobRequests keys and Arrangement keys
- *
  * Currently deletion of levels and nodes is not supported
  *
  * //TODO check that this works for subtypes
