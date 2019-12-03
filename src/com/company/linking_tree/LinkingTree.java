@@ -179,12 +179,18 @@ public class LinkingTree {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Find nodes of type {@code valueType} without value
+     */
     public <V> List<LevelMap.Node> findEmptyNodes(Class<V> valueType) {
         return findAllNodes(valueType).stream()
                 .filter(node -> node.value == null)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Find all nodes without value
+     */
     public Map<Class, List<LevelMap.Node>> findEmptyNodes() {
         return classLevelMap.keySet().stream()
                 .filter(clazz -> !findEmptyNodes(clazz).isEmpty())
@@ -300,11 +306,10 @@ public class LinkingTree {
     }
 
     //TODO accept Entity::method reference instead of key
-    //TODO method checking if there is a key without value
     //TODO method populating nodes without values using pair(key, value) or collection of values and keyExtractor method
-    //TODO method linking Nodes/keys of one level with child keys/values
-    //TODO public void find(Object... args)
-    //TODO implement add child with/out value first, add parent later
+    //TODO method linking Nodes/keys of one level with child keys/values, e.g. CobRequest::setParties()
+    //TODO find(Object... args)
+    //TODO put child with/out value first, add parent later
     //TODO sanity check - every node should be reachable from one of the 1st level nodes
     //TODO build LinkingTree using reflection, traverse fields/methods from root to child classes
 }
