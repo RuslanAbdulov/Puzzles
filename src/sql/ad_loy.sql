@@ -1,7 +1,7 @@
 create table if not exists ad_loy(
     cid bigint(20),
-    first_name varchar(50), -- in file 150
-    last_name varchar(50),
+    first_name varchar(50), -- 150 in file
+    last_name varchar(50), -- 150 in file
     line1 varchar(400),
     line2 varchar(400),
     city varchar(200),
@@ -11,7 +11,7 @@ create table if not exists ad_loy(
     birth_date date,
     mobile_number varchar(25),
     gender tinyint(1), -- not nvarchar2(10)
-    loyalty_number nvarchar(255),
+    loyalty_number varchar(255), -- to big, CHAR(20) in file
     email_address varchar(150),
     valid_address tinyint(1),
     record_type char(1),
@@ -34,41 +34,6 @@ create table if not exists ad_loy(
     CONSTRAINT ad_loy_pk PRIMARY KEY (cid)
 );
 
-create table Ad_Loy(
-    cid number(20),
-    first_name nvarchar2(50), --150
-    last_name nvarchar2(50), --150
-    line1 varchar2(400),
-    line2 varchar2(400),
-    city varchar2(200),
-    state varchar2(200),
-    zip varchar2(100),
-    country varchar2(200),
-    birth_date date, --not timestamp(4)
-    mobile_number nvarchar2(25),
-    gender tinyint(1), --not nvarchar2(10)
-    loyalty_number nvarchar(255), --char(20)
-    email_address nvarchar2(150),
-    valid_address tinyint(1),
-    record_type char(1),
-    valid_email_address tinyint(1),
-    cell_double_opt_in tinyint(1),
-    employee_status tinyint(1),
-    store_number number(10),
-    language_preference nvarchar2(20), --char(5)
-    enrollment_date date, --not timestamp(4)
-    enrollment_source number(10), --too big?
-    enrollment_id varchar(20),
-    aecc_status tinyint(1),
-    aecc_open_date date, --not timestamp(4)
-    aecc_close_date date, --noy timestamp(4)
-    aevisa_status tinyint(1),
-    aevisa_account_key varchar2(80),
-    aevisa_open_date date, --not timestamp(4)
-    aevisa_close_date date, --not timestamp(4)
-
-    PRIMARY KEY (cid)
-);
 
 
 
