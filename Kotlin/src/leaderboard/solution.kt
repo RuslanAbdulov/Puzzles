@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 
     println(result.joinToString("\n"))
 
-    println("======correcct:=====")
+    println("======correct:=====")
     println(Array(alice.size){ i -> findPlace(scores, alice[i])}.joinToString("\n"))
 }
 
@@ -68,19 +68,20 @@ class OptimalSolution(private val scores: Array<Int>) {
     }
 
     private fun findIndex(array: Array<Int>, newElement: Int, from: Int, to: Int): Int {
-        val index = (to - from)/2
+        val mid = (to - from)/2
         //difference is less than 2
-        if (index == 0) {
+        if (mid == 0) {
             return when {
                 array[from] <= newElement -> from
                 array[to] <= newElement -> to
                 else -> to + 1
             }
         }
+        val index = from + mid
         //reversed binary search
         return when {
-            array[index] < newElement -> findIndex(array, newElement, from,  from + index)
-            array[index] > newElement -> findIndex(array, newElement, to - index, to)
+            array[index] < newElement -> findIndex(array, newElement, from,  index - 1)
+            array[index] > newElement -> findIndex(array, newElement, index + 1, to)
             else -> index
         }
     }
