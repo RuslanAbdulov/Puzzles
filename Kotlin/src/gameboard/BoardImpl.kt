@@ -56,31 +56,32 @@ class SquareBoardImpl(override val width: Int) : SquareBoard {
 
 class GameBoardImpl<T>(override val width: Int): GameBoard<T>,
         SquareBoard by SquareBoardImpl(width) {
-    val map = mutableMapOf<Cell, T>()
+//    private val map = mutableMapOf<Cell, T?>()
+
+    private val map = getAllCells().associateWithTo(mutableMapOf<Cell, T?>()) { null }
 
     override fun get(cell: Cell): T? {
-        TODO("Not yet implemented")
+        return map[cell]
     }
 
     override fun set(cell: Cell, value: T?) {
-        TODO("Not yet implemented")
+        map.put(cell, value)
     }
 
     override fun filter(predicate: (T?) -> Boolean): Collection<Cell> {
-        TODO("Not yet implemented")
+        return map.filterValues(predicate).keys
     }
 
     override fun find(predicate: (T?) -> Boolean): Cell? {
-        TODO("Not yet implemented")
+        return map.filterValues(predicate).keys.first()
     }
 
     override fun any(predicate: (T?) -> Boolean): Boolean {
-        TODO("Not yet implemented")
+        return map.filterValues(predicate).any()
     }
 
     override fun all(predicate: (T?) -> Boolean): Boolean {
-        TODO("Not yet implemented")
+        return map.all{(_, value) -> value.run(predicate)}
     }
-
 
 }
