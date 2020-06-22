@@ -1,6 +1,6 @@
-package board
+package gameboard.board
 
-import board.Direction.*
+import gameboard.board.Direction.*
 
 fun createSquareBoard(width: Int): SquareBoard = SquareBoardImpl(width)
 fun <T> createGameBoard(width: Int): GameBoard<T> = GameBoardImpl(width)
@@ -12,7 +12,7 @@ val directionMask = mapOf (
         LEFT to Cell(0, -1))
 
 class SquareBoardImpl(override val width: Int) : SquareBoard {
-    private val cells: Array<Array<Cell>> = Array(width) {i -> Array(width) {j -> Cell(i + 1, j + 1) } }
+    private val cells: Array<Array<Cell>> = Array(width) { i -> Array(width) { j -> Cell(i + 1, j + 1) } }
 
     override fun getCellOrNull(i: Int, j: Int): Cell? {
         return if (inBorders(i, j))
