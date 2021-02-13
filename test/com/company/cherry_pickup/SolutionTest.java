@@ -98,7 +98,7 @@ public class SolutionTest {
 
         int result = solution.cherryPickup(grid);
 
-        assertEquals(10, result);
+        assertEquals(11, result);
     }
 
     @Test
@@ -130,6 +130,29 @@ public class SolutionTest {
         int result = solution.cherryPickup(grid);
 
         assertEquals(15, result);
+    }
+
+    //Time consuming calculations
+
+    //35s
+    @Test
+    public void test10() {
+        int[][] grid = new int[][]{
+                new int[] {1, 1, 1, 1,-1,-1,-1, 1, 0, 0},
+                new int[] {1, 0, 0, 0, 1, 0, 0, 0, 1, 0},
+                new int[] {0, 0, 1, 1, 1, 1, 0, 1, 1, 1},
+                new int[] {1, 1, 0, 1, 1, 1, 0,-1, 1, 1},
+                new int[] {0, 0, 0, 0, 1,-1, 0, 0, 1,-1},
+                new int[] {1, 0, 1, 1, 1, 0, 0,-1, 1, 0},
+                new int[] {1, 1, 0, 1, 0, 0, 1, 0, 1,-1},
+                new int[] {1,-1, 0, 1, 0, 0, 0, 1,-1, 1},
+                new int[] {1, 0,-1, 0,-1, 0, 0, 1, 0, 0},
+                new int[] {0, 0,-1, 0, 1, 0, 1, 0, 0, 1}
+        };
+
+        int result = solution.cherryPickup(grid);
+
+        assertEquals(22, result);
     }
 
 }
