@@ -1,14 +1,17 @@
 package com.company.cherry_pickup;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Solution {
 
-    public static final Character RIGHT = 'R';
+    public static final Character FORWARD = 'F';
     public static final Character EMPTY = '0';
 
     public int cherryPickup(int[][] grid) {
@@ -17,21 +20,85 @@ class Solution {
         //Number of steps 2(N-1)
         //0.. 2(N-1) - (N-1) = 0..N-1
 
-        List<Character[]> permutations = permutations(new Character[0], RIGHT, N-1, 2*(N-1));
+        List<Character[]> permutations = permutations(new Character[0], FORWARD, N-1, 2*(N-1));
+        Map<Character[], Integer> topScores = topScorePermutations(grid, permutations, true);
 
-//        System.out.println("grid = " + Arrays.deepToString(grid));
-        print(permutations);
+        int maxScore = 0;
+        for (Map.Entry<Character[], Integer> entry: topScores.entrySet()) {
+            Map<Character[], Integer> topReverseScores =
+                    topScorePermutations(traversedGrid(grid, entry.getKey()), permutations, false);
+            int newScore = topReverseScores.values().stream().findFirst().orElse(0) + entry.getValue();
+            if (newScore > maxScore) {
+                maxScore = newScore;
+                print(Collections.singleton(entry.getKey()));
+                print(topReverseScores.keySet());
+            }
+        }
 
+//        print(permutations);
 
-//        for (int i = 0; i < N-1; i++) {
-//            for (int j = 0; j < N; j++) {
-//
-//            }
-//        }
-
-        return 0;
+        return maxScore;
     }
 
+    Map<Character[], Integer> topScorePermutations(int[][] grid, List<Character[]> paths, boolean direct) {
+        int direction = direct ? 1 : -1;
+
+        int globalMax = 0;
+        Map<Character[], Integer> top = new HashMap<>();
+
+        for (Character[] path: paths) {
+            int score = 0;
+            int curR = direct ? 0 : grid.length-1;
+            int curC = direct ? 0 : grid.length-1;
+            if (grid[curR][curC] == -1) {
+                continue;
+            }
+            if (grid[curR][curC] == 1) {
+                score++;
+            }
+            for (int i = 0; i < path.length; i++) {
+                if (path[i] == FORWARD) {
+                    curC += direction;
+                } else {
+                    curR += direction;
+                }
+                if (grid[curR][curC] == -1) {
+                    score = -1;
+                    break;
+                }
+                if (grid[curR][curC] == 1) {
+                    score++;
+                }
+
+            }
+            if (score == globalMax && score > 0) {
+                top.put(path, score);
+            }
+            if (score > globalMax) {
+                top.clear();
+                top.put(path, score);
+            }
+        }
+
+        return top;
+    }
+
+    //Only for direct traversal
+    int[][] traversedGrid(int[][] grid, Character[] path) {
+        int[][] traversedGrid = Arrays.copyOf(grid, grid.length);
+        int curR = 0;
+        int curC = 0;
+        traversedGrid[curR][curC] = 0;
+        for (int i = 0; i < path.length; i++) {
+            if (path[i] == FORWARD) {
+                curC++;
+            } else {
+                curR++;
+            }
+            traversedGrid[curR][curC] = 0;
+        }
+        return traversedGrid;
+    }
 
     List<Character[]> permutations(Character[] prefix, Character direction, int number, int length) {
         if (number > length) {
@@ -65,7 +132,7 @@ class Solution {
         return target;
     }
 
-    void print(List<Character[]> permutations) {
+    <T> void print(Collection<T[]> permutations) {
         permutations.stream()
                 .map(Arrays::deepToString)
                 .forEach(System.out::println);
