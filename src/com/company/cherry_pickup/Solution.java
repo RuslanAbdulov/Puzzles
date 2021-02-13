@@ -30,7 +30,9 @@ class Solution {
             int newScore = topReverseScores.values().stream().findFirst().orElse(0) + entry.getValue();
             if (newScore > maxScore) {
                 maxScore = newScore;
+                System.out.println("Direct paths");
                 print(Collections.singleton(entry.getKey()));
+                System.out.println("Reverse paths");
                 print(topReverseScores.keySet());
             }
         }
@@ -77,6 +79,7 @@ class Solution {
             if (score > globalMax) {
                 top.clear();
                 top.put(path, score);
+                globalMax = score;
             }
         }
 
