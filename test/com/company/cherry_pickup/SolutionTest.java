@@ -37,4 +37,16 @@ public class SolutionTest {
         assertEquals(2, result);
     }
 
+
+    @Test
+    public void test3() {
+        int[][] grid = new int[][]{
+                new int[] {0, 0},
+                new int[] {1, 0}};
+
+        int result = solution.cherryPickup(grid);
+
+        assertEquals(1, result);
+    }
+
 }
