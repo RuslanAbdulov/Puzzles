@@ -90,4 +90,12 @@ public class SolutionTest {
         assertThat(Sets.newHashSet("cbababc", "bbcccbb"), hasItem(result));
     }
 
+    @Test
+    public void test10_VeryVerySlow() {
+        String result = solution.longestPalindrome("babaddtattarrattatddetartrateedredividerb");
+
+        assertThat(Sets.newHashSet("cbababc", "bbcccbb"), hasItem(result));
+    }
+
+
 }
