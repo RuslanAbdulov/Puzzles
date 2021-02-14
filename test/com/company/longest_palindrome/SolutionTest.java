@@ -44,7 +44,7 @@ public class SolutionTest {
     public void test3_Empty() {
         String result = solution.longestPalindrome("abcde");
 
-        assertEquals("" , result);
+        assertEquals("a" , result);
     }
 
 
@@ -54,4 +54,40 @@ public class SolutionTest {
 
         assertEquals("aca" , result);
     }
+
+    @Test
+    public void test5() {
+        String result = solution.longestPalindrome("acabdaca");
+
+        assertEquals("aca" , result);
+    }
+
+    @Test
+    public void test6() {
+        String result = solution.longestPalindrome("aaca");
+
+        assertEquals("aca" , result);
+    }
+
+    @Test
+    public void test8() {
+        String result = solution.longestPalindrome("bacabab");
+
+        assertEquals("bacab", result);
+    }
+
+    @Test
+    public void test9() {
+        String result = solution.longestPalindrome("xaabacxcabaaxcabaax");
+
+        assertEquals("xaabacxcabaax", result);
+    }
+
+    @Test
+    public void test7_VerySlow() {
+        String result = solution.longestPalindrome("abbcccbbbcaaccbababcbcabca");
+
+        assertThat(Sets.newHashSet("cbababc", "bbcccbb"), hasItem(result));
+    }
+
 }

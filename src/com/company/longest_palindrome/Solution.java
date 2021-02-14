@@ -18,14 +18,16 @@ class Solution {
         if (from == to) {
             return common + chars[from] + flip(common);
         }
+
+        String bigPalindrome = "";
         if (chars[from] == chars[to]) {
-            return dp(chars, from + 1, to - 1, common + chars[from]);
+            bigPalindrome = dp(chars, from + 1, to - 1, common + chars[from]);
         }
 
         String left = dp(chars, from, to - 1, "");
         String right = dp(chars, from + 1, to, "");
 
-        return maxByLength(left, right);
+        return maxByLength(maxByLength(left, right), bigPalindrome);
     }
 
     String maxByLength(String left, String right) {
