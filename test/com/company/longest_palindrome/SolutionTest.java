@@ -69,6 +69,7 @@ public class SolutionTest {
         assertEquals("aca" , result);
     }
 
+    //2^N
     @Test
     public void test8() {
         String result = solution.longestPalindrome("bacabab");
@@ -94,7 +95,7 @@ public class SolutionTest {
     public void test10_VeryVerySlow() {
         String result = solution.longestPalindrome("babaddtattarrattatddetartrateedredividerb");
 
-        assertThat(Sets.newHashSet("cbababc", "bbcccbb"), hasItem(result));
+        assertThat(Sets.newHashSet("ddtattarrattatdd"), hasItem(result));
     }
 
 

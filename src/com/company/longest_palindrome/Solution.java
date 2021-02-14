@@ -8,25 +8,22 @@ class Solution {
 
         char[] charArray = s.toCharArray();
 
-        String palindrome = dp(charArray, 0, charArray.length - 1);
+        String pal = fast(charArray);
 
-        return palindrome.length() > 0 ? palindrome : "";
+        return pal.length() > 0 ? pal : "";
     }
 
-    String dp(char[] chars, int from, int to) {
-        if (from > to) {
-            return "";
+    String fast(char[] charArray) {
+        for (int size = charArray.length; size > 0; size--) {
+            int steps = charArray.length - size + 1;
+            for (int j = 0; j < steps; j++) {
+                if (isPalindrome(Arrays.copyOfRange(charArray, j, size + j))) {
+                    return new String(Arrays.copyOfRange(charArray, j, size + j));
+                }
+            }
+
         }
-
-        char[] partial = Arrays.copyOfRange(chars, from, to+1);
-        if (isPalindrome(partial)) {
-            return new String(partial);
-        }
-
-        String left = dp(chars, from, to - 1);
-        String right = dp(chars, from + 1, to);
-
-        return maxByLength(left, right);
+        return "";
     }
 
     boolean isPalindrome(char[] chars) {
@@ -41,21 +38,4 @@ class Solution {
         return true;
     }
 
-    String maxByLength(String left, String right) {
-        if (left.length() >= right.length()) {
-            return left;
-        } else {
-            return right;
-        }
-    }
-
-    String flip(String str) {
-        char[] original = str.toCharArray();
-        int length = original.length;
-        char[] flipped = new char[length];
-        for (int i = length - 1; i >= 0 ; i--) {
-            flipped[length - i - 1] =  original[i];
-        }
-        return new String(flipped);
-    }
 }
