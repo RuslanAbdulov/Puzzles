@@ -56,6 +56,26 @@ class ODList<T> {
         return reverse;
     }
 
+    public void naiveReverse() {
+        int size = 0;
+
+        Node<T> cursor = head;
+        while(cursor != null) {
+            size++;
+            cursor = cursor.next();
+        }
+
+        for (int i = size - 1; i >= 0 ; i--) {
+            cursor = head;
+            for (int j = 0; j < i; j++) {
+                cursor = cursor.next();
+            }
+            System.out.println(cursor.getValue());
+        }
+
+
+    }
+
     public int getSize() {
         return size;
     }

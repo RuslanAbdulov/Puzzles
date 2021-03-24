@@ -20,4 +20,9 @@ public class ODListTest {
     public void testReverse() {
         assertEquals("ODList[3, 2, 1]", list.reverse().toString());
     }
+
+    @Test
+    public void testNaiveReverse() {
+        list.naiveReverse();
+    }
 }
